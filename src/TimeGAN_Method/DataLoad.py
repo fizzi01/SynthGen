@@ -22,7 +22,7 @@ class Data:
         df = df.set_index('timestamp').sort_index()
 
         #Adding categorical month column
-        self.data['Mese'] = self.data.index.month_name()
+        df['Mese'] = df.index.month_name()
         print(df.shape)
 
         return df
