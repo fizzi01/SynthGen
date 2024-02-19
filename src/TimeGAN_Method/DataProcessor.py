@@ -25,18 +25,17 @@ class DataProcessor():
         ori_data = data[::-1]
         ori_cat_data = cat_data[::-1]
         # Normalize the data
-        if data and data.shape[0] > 0:
+        if len(ori_data) > 0:
             self.scaler_num = MinMaxScaler().fit(ori_data)
         else:
             raise ValueError("Data is empty")
 
-        if cat_data and cat_data.shape[0] > 0:
+        if len(cat_data) > 0:
             self.scaler_cat = OneHotEncoder().fit(ori_cat_data)
 
         return self
 
-    def transform(self, data: np.ndarray, cat_data: np.ndarray) -> Tuple[
-        Any, ndarray[Any, dtype[Any]]]:
+    def transform(self, data: np.ndarray, cat_data: np.ndarray):
         # Normalizazzione
         ori_data = data[::-1]
         ori_cat_data = cat_data[::-1]
