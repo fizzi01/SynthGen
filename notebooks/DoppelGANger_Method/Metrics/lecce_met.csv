@@ -1,0 +1,9 @@
+Parameter,RMSE,MSE
+temperature_2m (°C),4.426169,19590.980
+relative_humidity_2m (%),18.534055,343.511229
+surface_pressure (hPa),8.474317,71.814056
+wind_speed_10m (m/s),2.893359,8.371527
+wind_speed_100m (m/s),4.433283,19.654004
+shortwave_radiation_instant (W/m²),95.267346,9075.867303
+diffuse_radiation_instant (W/m²),70.247399,4934.697075
+direct_normal_irradiance_instant (W/m²),188.470151,35520.997944

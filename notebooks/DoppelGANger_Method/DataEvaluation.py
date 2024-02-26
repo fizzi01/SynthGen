@@ -20,9 +20,8 @@ def get_metrics(real_df: pd.DataFrame, synth_df: pd.DataFrame, params: list):
     for metric in METRICS:
         for parameter in params:
             tmp = metrics_val[metric][parameter]
-            tmp.append(
-                evaluate(real_df.head(synth_df.shape[0])[parameter].reset_index(drop=True), synth_df[parameter],
-                         metric))
+            tmp = evaluate(real_df.head(synth_df.shape[0])[parameter].reset_index(drop=True), synth_df[parameter],
+                           metric)
             metrics_val[metric][parameter] = tmp
 
     return pd.DataFrame.from_dict(metrics_val, orient='columns')
