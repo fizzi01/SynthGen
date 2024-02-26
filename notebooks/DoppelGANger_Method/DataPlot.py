@@ -20,12 +20,12 @@ def plty_plot_dataframes(dataframes, title: str = "Plot"):
         hovermode='closest'
     )
 
-    for df in dataframes:
+    for i,df in enumerate(dataframes):
         for col in df.columns:
-            fig.add_trace(go.Scatter(x=df.index, y=df[col], mode='lines', name=col))
+            fig.add_trace(go.Scatter(x=df.index, y=df[col], mode='lines', name=f"{i}_{col}", opacity=float(1/(i+1))))
 
     # Abilita la possibilità di mostrare/nascondere ogni linea dalla legenda
     fig.update_layout(legend=dict(itemsizing='constant'))
     # Mostra il grafico
-    # fig.show()
-    fig.show(renderer='plotly_mimetype+notebook')
+    fig.show()
+    #fig.show(renderer='plotly_mimetype+notebook')

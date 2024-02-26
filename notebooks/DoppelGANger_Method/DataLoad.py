@@ -22,7 +22,7 @@ class Data:
 
         return df
 
-    def prepare_data(self, num_col: list = None, cat_col: list = None):
+    def prepare_data(self, seq_lenght: int = 24, num_col: list = None, cat_col: list = None):
 
         if num_col is None:
             num_col = self.data.columns
@@ -33,7 +33,8 @@ class Data:
             self.data['Mese'] = self.data.index.month_name()
 
         data_tmp = self.data.reset_index(drop=True)
-        self.processor = dp.DataProcessor()
+        self.processor = dp.DataProcessor(seq_lenght=seq_lenght, numerical_columns=num_col,
+                                          categorical_columns=cat_col)
         self.processor.fit(data_tmp[num_col].values)
         transformed = self.processor.transform(data_tmp[num_col].values)
         transformed = pd.DataFrame(transformed, columns=num_col).reset_index(drop=True)
