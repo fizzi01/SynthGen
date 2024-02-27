@@ -4,7 +4,7 @@ import sys
 import numpy as np
 from pvlib import clearsky
 from pvlib.location import Location
-import tqdm
+
 from tqdm import trange
 
 from DataLoader import *
@@ -24,7 +24,7 @@ class Generator:
 
         self.res = resolution
         self.file_path = file_path
-        self.data_load = DataLoader(self.file_path)
+        self.data_load = DataLoader(filename=self.file_path)
 
         self._extracted_param: dict = {}
         self.labelled_days: dict = {}
@@ -32,6 +32,12 @@ class Generator:
         self._param_matrix: dict = {}
         self._categories: list = []
         self._distr: np.array = None
+
+    def get_days_matrix(self):
+        """
+        :return: Days values per category
+        """
+        return self._param_matrix.copy()
 
     def _extract_data(self):
         """Extract every parameter from data"""
@@ -44,9 +50,14 @@ class Generator:
                                                                     resolution=self.res)
         return extracted_param
 
-    def _day_labelling(self):
+    def _day_labelling(self) -> dict[Category, list[str]]:
+        """
+        Categorizza ogni giorno del mese
+        :return: dizionario con i giorni divisi per categoria
+        """
         tus = self.location
 
+        # Preparo gli indici temporali per i quali ottenere valori di clear-sky
         if isinstance(self.year, list):
             time_ranges = []
             df_cs = []
@@ -69,11 +80,6 @@ class Generator:
                                   freq=f'{self.res}min')
             cs = tus.get_clearsky(times)  # ineichen with climatology table by default
 
-        """cs.plot()
-        plt.ylabel('Irradiance $W/m^2$')
-        plt.title('Ineichen, climatological turbidity')
-        plt.show()"""
-
         # Recupero la lista dei valori di clear sky da usare come costanti
         constants = {}
         for i, time in enumerate(times):
@@ -86,8 +92,7 @@ class Generator:
         """Per ogni categoria, inserisce al corrispettivo giorno i valori del parametro"""
         tmp_matrix = {}
 
-        for i in trange(len(list(self._extracted_param.items())), file=sys.stdout,desc='Mapping data'):
-        #for param, data in self._extracted_param.items():
+        for i in trange(len(list(self._extracted_param.items())), file=sys.stdout, desc='Mapping data'):
             param, data = list(self._extracted_param.items())[i]
             tmp_matrix[param] = self._category_matrix(data, self.labelled_days)
 
@@ -104,7 +109,7 @@ class Generator:
         days_serie = np.random.choice(a=self._categories, size=series_len, p=self._distr).tolist()
 
         samples = []
-        for i in trange(series_len,file=sys.stdout, desc='Generating samples'):
+        for i in trange(series_len, file=sys.stdout, desc='Generating samples'):
             day_cat = days_serie[i]
             tmp = []
             for param, matrix in self._param_matrix.items():
@@ -124,7 +129,7 @@ class Generator:
     def _day_distribution(cat_days: dict[Category, list[str]]):
         """
         Calcola la distribuzione delle categorie dei giorni
-        :param cat_days:
+        :param cat_days: Dizionario con lista di giorni categorizzati
         :return: Lista delle categorie Lista delle probabilitá delle categorie
         """
         # Calcolo delle frequenze per categoria
@@ -183,7 +188,12 @@ class Generator:
         return category
 
     @staticmethod
-    def _generate_synt_data(matrix: dict[Category, pd.DataFrame]):
+    def _generate_synt_data(matrix: dict[Category, pd.DataFrame]) -> dict[Category, pd.DataFrame]:
+        """
+        Genera sample per ogni categoria
+        :param matrix: Dizionario con i valori dei giorni categorizzati
+        :return: Dizionario con 1 sample per ogni categoria
+        """
         synt = {}
 
         for category, matrice in matrix.items():
@@ -211,7 +221,7 @@ class Generator:
             if timestamps_di_interesse:
                 primo_timestamp = timestamps_di_interesse[0]
                 ultimo_timestamp = timestamps_di_interesse[-1]
-                # Filtra le colonne del DataFrame matrice basandoti sull'intervallo trovato
+                # Filtra le colonne del DataFrame matrice basandosi sull'intervallo trovato
                 indice_inizio = all_timestamps.index(primo_timestamp)
                 indice_fine = all_timestamps.index(ultimo_timestamp)
                 selected_timestamps = all_timestamps[indice_inizio:indice_fine + 1]
@@ -273,10 +283,7 @@ class Generator:
                         lower = min_val
 
                     if upper < lower:  # Caso in cui il lower risulti negativo a causa di valori troppo piccoli
-                        tmp = upper
-                        upper = lower
-                        lower = upper
-                        # upper = max_val
+                        upper = max_val
 
                     temp = pd.DataFrame({
                         selected_timestamps[i - 1]: val_1,

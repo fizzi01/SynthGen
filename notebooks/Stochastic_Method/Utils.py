@@ -1,10 +1,8 @@
 from enum import Enum
 import pandas as pd
 import matplotlib.pyplot as plt
-from lets_plot import *
 import plotly.graph_objects as go
 
-LetsPlot.setup_html()
 
 
 class Category(Enum):
@@ -115,13 +113,13 @@ def plot_dataframes(dataframes, title: str = "Plot"):
         plt.show()
 
 
-def lets_plot_dataframes(dataframes, title: str = "Plot"):
-    """
+"""def lets_plot_dataframes(dataframes, title: str = "Plot"):
+    
     Fa il plot di una lista di DataFrame su un unico grafico con colori diversi.
 
     :param title: Titolo dataframe
     :param dataframes: Lista di DataFrame da plottare.
-    """
+    
 
     # Trasforma i DataFrame in un formato long per il plotting
     for df in dataframes:
@@ -136,35 +134,58 @@ def lets_plot_dataframes(dataframes, title: str = "Plot"):
             800, 400)
 
         p += ggtitle(title)
-        p.show()
+        p.show()"""
 
 
-def plty_plot_dataframes(dataframes, title: str = "Plot"):
+def plty_plot_dataframes(dataframes, title: str = "Plot", compare: bool = False):
     """
     Fa il plot di una lista di DataFrame su un unico grafico con colori diversi.
 
+    :param compare: Enable comparison between dataframes
     :param title: Titolo dataframe
     :param dataframes: Lista di DataFrame da plottare.
     """
 
-    # Trasforma i DataFrame in un formato long per il plotting
-    for df in dataframes:
-        # Crea una figura Plotly
+    if compare:
+
         fig = go.Figure()
-        # "Sciogliere" il DataFrame da un formato wide a un formato long
-        for col in df.columns:
-            fig.add_trace(go.Scatter(x=df.index, y=df[col], mode='lines', name=col))
-        # Aggiungi opzioni di layout per zoom e legenda interattiva
+
         fig.update_layout(
             title=title,
             xaxis_title='Time',
-            yaxis_title='Valori',
-            legend_title='Parametri',
+            yaxis_title='Values',
+            legend_title='Prameters',
             hovermode='closest'
         )
+
+        for i, df in enumerate(dataframes):
+            for col in df.columns:
+                fig.add_trace(
+                    go.Scatter(x=df.index, y=df[col], mode='lines', name=f"{i}_{col}", opacity=float(1 / (i + 1))))
 
         # Abilita la possibilità di mostrare/nascondere ogni linea dalla legenda
         fig.update_layout(legend=dict(itemsizing='constant'))
 
         # Mostra il grafico
         fig.show(renderer='plotly_mimetype+notebook')
+    else:
+        for df in dataframes:
+            fig = go.Figure()
+
+            for col in df.columns:
+                fig.add_trace(go.Scatter(x=df.index, y=df[col], mode='lines', name=col))
+
+            fig.update_layout(
+                title=title,
+                xaxis_title='Time',
+                yaxis_title='Values',
+                legend_title='Prameters',
+                hovermode='closest'
+            )
+
+            # Abilita la possibilità di mostrare/nascondere ogni linea dalla legenda
+            fig.update_layout(legend=dict(itemsizing='constant'))
+
+            # Mostra il grafico
+            fig.show(renderer='plotly_mimetype+notebook')
+

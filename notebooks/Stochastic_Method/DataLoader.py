@@ -1,4 +1,6 @@
 # Contiene funzioni per il loading dei dati dai file CSV
+import copy
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -14,7 +16,13 @@ class DataLoader:
         """
         Legge il file CSV e lo memorizza in un DataFrame per successive elaborazioni
         """
-        return pd.read_csv(self.filename)
+        df = pd.read_csv(self.filename)
+
+        # Converting in datetime
+        df['timestamp'] = pd.to_datetime(df['timestamp'], unit='s')
+        df = df.set_index('timestamp').sort_index()
+
+        return df
 
     def list_parameters(self) -> list[str]:
         """
@@ -41,8 +49,11 @@ class DataLoader:
         if resolution == 60:
             resolution = None
 
-        # Convertire timestamp Unix in datetime
-        self.data['timestamp'] = pd.to_datetime(self.data['timestamp'], unit='s')
+
+        #self.data.reset_index(drop=False)
+        #self.data['timestamp'] = pd.to_datetime(self.data['timestamp'], unit='s')
+        original_data = self.data.copy(deep=True)
+        self.data = self.data.reset_index(drop=False)
 
         # Filtrare per anno e mese se specificato
         if year is not None and month is not None:
@@ -117,6 +128,9 @@ class DataLoader:
         for item in extracted_data:
             item['timestamp'] = int(item['timestamp'].timestamp())
             item[parameter] = float(item[parameter])  # Assicurarsi che i valori siano float
+
+        # Restoring original data
+        self.data = original_data.copy(deep=True)
 
         return extracted_data
 
