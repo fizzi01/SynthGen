@@ -2,12 +2,16 @@ import pandas as pd
 import plotly.graph_objects as go
 
 
-def confronta_csv_plotly(file_csv_1, file_csv_2, file1_name, file2_name):
+def metric_compare(file_csv_1: str = "", file_csv_2: str = "", label1: str = "", label2: str = "",
+                   metric: str = "RMSE", ):
     # Carica i dati dai file CSV
     df1 = pd.read_csv(file_csv_1, decimal='.')
     df2 = pd.read_csv(file_csv_2, decimal='.')
 
-    df_merged = pd.merge(df1, df2, on=df1.columns[0], suffixes=(f' {file1_name}', f' {file2_name}'))
+    filter_col = [df1.columns[0]]
+    filter_col += [col for col in df1.columns if col == metric]
+
+    df_merged = pd.merge(df1[filter_col], df2[filter_col], on=df1.columns[0], suffixes=(f' {label1}', f' {label2}'))
 
     metrics = [col for col in df_merged.columns if col not in df1.columns[0]]
 

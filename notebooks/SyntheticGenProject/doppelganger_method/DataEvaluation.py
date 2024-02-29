@@ -10,6 +10,14 @@ METRICS = ["RMSE", "MSE"]
 
 
 def get_metrics(real_df: pd.DataFrame, synth_df: pd.DataFrame, params: list):
+    # Estraggo gli anni presenti nel dataset
+    years = real_df.index.year.unique()
+    cut_df = []
+
+    # Divido il dataframe per anno
+    for year in years:
+        cut_df.append(real_df[real_df.index.year == year])
+
     metrics_val = {}
 
     for metric in METRICS:
@@ -20,9 +28,12 @@ def get_metrics(real_df: pd.DataFrame, synth_df: pd.DataFrame, params: list):
     for metric in METRICS:
         for parameter in params:
             tmp = metrics_val[metric][parameter]
-            tmp = evaluate(real_df.head(synth_df.shape[0])[parameter].reset_index(drop=True), synth_df[parameter],
-                           metric)
-            metrics_val[metric][parameter] = tmp
+            for year in cut_df:
+                tmp.append(evaluate(year.head(synth_df.shape[0])[parameter].reset_index(drop=True), synth_df[parameter],
+                                    metric))
+                break  # Rimuovere per fare la media sugli anni del dataset
+
+            metrics_val[metric][parameter] = np.mean(np.array(tmp))
 
     return pd.DataFrame.from_dict(metrics_val, orient='columns')
 
