@@ -20,8 +20,8 @@ def plty_plot_dataframes(dataframes, title: str = "Plot"):
         fig.update_layout(
             title=title,
             xaxis_title='Time',
-            yaxis_title='Valori',
-            legend_title='Parametri',
+            yaxis_title='Values',
+            legend_title='Parameters',
             hovermode='closest'
         )
 

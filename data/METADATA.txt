@@ -1,0 +1,9 @@
+LECCE
+params = {
+	"latitude": 40.3548,
+	"longitude": 18.1724,
+	"start_date": "2022-01-01",
+	"end_date": "2023-12-31",
+	"hourly": ["temperature_2m", "relative_humidity_2m", "surface_pressure", "wind_speed_10m", "wind_speed_100m", "shortwave_radiation_instant", "diffuse_radiation_instant", "direct_normal_irradiance_instant"],
+	"wind_speed_unit": "ms"
+}

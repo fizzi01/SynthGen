@@ -1,0 +1,1 @@
+Python version needed: 3.8
